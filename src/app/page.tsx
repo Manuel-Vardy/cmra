@@ -13,7 +13,7 @@ import { ArrowLeft, ShieldAlert } from 'lucide-react';
 export default function ResidentPortalPage() {
   const [activeTab, setActiveTab] = useState<UserNavTab>('home');
   const [selectedCategory, setSelectedCategory] = useState<IssueCategory>('Environment');
-  const [trackingReportNumber, setTrackingReportNumber] = useState<string>('CR-2026-004821');
+  const [trackingReportNumber, setTrackingReportNumber] = useState<string>('');
 
   const handleTrackReport = (reportNumber: string) => {
     setTrackingReportNumber(reportNumber);

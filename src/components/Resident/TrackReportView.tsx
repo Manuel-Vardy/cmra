@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   ThumbsUp,
   ThumbsDown,
+  FileSearch,
 } from 'lucide-react';
 import { IssueReport, ReportStatus } from '@/lib/types';
 
@@ -34,7 +35,7 @@ const LIFECYCLE_STEPS: ReportStatus[] = [
   'Closed',
 ];
 
-export default function TrackReportView({ initialReportNumber = 'CR-2026-004821' }: TrackReportViewProps) {
+export default function TrackReportView({ initialReportNumber = '' }: TrackReportViewProps) {
   const [searchId, setSearchId] = useState(initialReportNumber);
   const [report, setReport] = useState<IssueReport | null>(null);
   const [loading, setLoading] = useState(false);
@@ -161,6 +162,20 @@ export default function TrackReportView({ initialReportNumber = 'CR-2026-004821'
         <div className="max-w-md mx-auto p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-2xl text-center text-sm text-red-700 dark:text-red-300">
           <AlertCircle className="w-5 h-5 mx-auto mb-1 text-red-500" />
           {error}
+        </div>
+      )}
+
+      {!report && !loading && !error && (
+        <div className="max-w-md mx-auto p-8 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 text-center space-y-3">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <FileSearch className="w-7 h-7" />
+          </div>
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+            No Report Selected
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
+            Enter your Report Tracking ID above and click <span className="font-semibold text-blue-600 dark:text-blue-400">Track</span> to view its live status and resolution progress.
+          </p>
         </div>
       )}
 
