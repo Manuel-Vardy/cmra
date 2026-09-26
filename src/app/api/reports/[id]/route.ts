@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase, addAuditLog, updateReport } from '@/lib/db';
 import { ReportStatus, ReportPriority } from '@/lib/types';
+import { sendReportStatusUpdatedNotification } from '@/lib/emailService';
 
 export async function GET(
   request: NextRequest,
@@ -69,17 +70,17 @@ export async function PATCH(
       details: `Status transitioned from "${oldStatus}" to "${newStatus}"`,
     });
 
-    // Send status update notification to citizen asynchronously
-    import('@/lib/emailService').then(({ sendReportStatusUpdatedNotification }) => {
-      sendReportStatusUpdatedNotification(
+    // Send status update notification to citizen (awaited for serverless reliability)
+    try {
+      await sendReportStatusUpdatedNotification(
         report,
         oldStatus,
         newStatus,
         body.statusNotes
-      ).catch((err) => {
-        console.warn('[Brevo] Failed to send status notification:', err);
-      });
-    });
+      );
+    } catch (err) {
+      console.warn('[Brevo] Failed to send status notification:', err);
+    }
   }
 
   // Handle priority update

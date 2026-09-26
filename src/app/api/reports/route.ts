@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase, generateReportNumber, detectDuplicates, addAuditLog, addReport } from '@/lib/db';
 import { IssueReport, ReportPriority, ReportStatus } from '@/lib/types';
+import { sendReportCreatedNotification } from '@/lib/emailService';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -151,12 +152,12 @@ export async function POST(request: NextRequest) {
       details: `New issue "${newReport.title}" reported under category ${newReport.category} with priority ${newReport.priority}`,
     });
 
-    // Send confirmation email to citizen asynchronously
-    import('@/lib/emailService').then(({ sendReportCreatedNotification }) => {
-      sendReportCreatedNotification(newReport).catch((err) => {
-        console.warn('[Brevo] Failed to send report confirmation email:', err);
-      });
-    });
+    // Send confirmation email to citizen immediately (awaited for serverless compatibility)
+    try {
+      await sendReportCreatedNotification(newReport);
+    } catch (err) {
+      console.warn('[Brevo] Failed to send report confirmation email:', err);
+    }
 
     return NextResponse.json({ success: true, report: newReport }, { status: 201 });
   } catch (error) {
