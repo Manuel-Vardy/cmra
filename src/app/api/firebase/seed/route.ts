@@ -3,6 +3,8 @@ import { INITIAL_REPORTS, INITIAL_AUDIT_LOGS } from '@/lib/db';
 import { seedFirestoreIfEmpty, fetchReportsFromFirestore } from '@/lib/firestoreService';
 import { firebaseConfig } from '@/lib/firebase';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const seedResult = await seedFirestoreIfEmpty(INITIAL_REPORTS, INITIAL_AUDIT_LOGS);
