@@ -22,26 +22,6 @@ interface MediaEvidenceUploaderProps {
   onMediaChange: (media: ReportMedia[]) => void;
 }
 
-const SAMPLE_MEDIA_OPTIONS = [
-  {
-    name: 'Pothole Hazard Photo.jpg',
-    url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80',
-    size: '1.8 MB',
-    type: 'image' as const,
-  },
-  {
-    name: 'Drainage Overflow Photo.jpg',
-    url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-    size: '2.4 MB',
-    type: 'image' as const,
-  },
-  {
-    name: 'Downed Power Lines.jpg',
-    url: 'https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&w=800&q=80',
-    size: '3.1 MB',
-    type: 'image' as const,
-  },
-];
 
 export default function MediaEvidenceUploader({
   mediaList,
@@ -199,19 +179,6 @@ export default function MediaEvidenceUploader({
 
   const handleRemoveMedia = (id: string) => {
     onMediaChange(mediaList.filter((m) => m.id !== id));
-  };
-
-  const handleAddSample = (sample: (typeof SAMPLE_MEDIA_OPTIONS)[0]) => {
-    onMediaChange([
-      ...mediaList,
-      {
-        id: 'sample-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-        type: sample.type,
-        name: sample.name,
-        url: sample.url,
-        size: sample.size,
-      },
-    ]);
   };
 
   return (
@@ -398,25 +365,6 @@ export default function MediaEvidenceUploader({
         </div>
       )}
 
-      {/* Quick Add Demo Presets */}
-      <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-        <span className="text-xs font-bold text-slate-600 dark:text-slate-300 block">
-          Or Quickly Attach Demo Evidence:
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {SAMPLE_MEDIA_OPTIONS.map((sample) => (
-            <button
-              key={sample.name}
-              type="button"
-              onClick={() => handleAddSample(sample)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-2xs"
-            >
-              <Camera className="w-3.5 h-3.5 text-blue-600" />
-              + {sample.name}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* LIVE CAMERA VIEWFINDER MODAL */}
       {isLiveCameraOpen && (

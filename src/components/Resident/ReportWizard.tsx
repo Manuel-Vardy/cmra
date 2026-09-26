@@ -87,23 +87,6 @@ const CATEGORIES: {
   },
 ];
 
-const SAMPLE_MEDIA_OPTIONS = [
-  {
-    name: 'Pothole Hazard Photo',
-    url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80',
-    size: '1.8 MB',
-  },
-  {
-    name: 'Drainage Overflow Photo',
-    url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-    size: '2.4 MB',
-  },
-  {
-    name: 'Streetlight Cable Damage',
-    url: 'https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&w=800&q=80',
-    size: '3.1 MB',
-  },
-];
 
 interface ReportWizardProps {
   onReportCreated?: (report: IssueReport) => void;
@@ -244,29 +227,6 @@ export default function ReportWizard({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleAddSamplePhoto = (sample: (typeof SAMPLE_MEDIA_OPTIONS)[0]) => {
-    setFormData((prev) => ({
-      ...prev,
-      media: [
-        ...prev.media,
-        {
-          id: 'media-' + Date.now(),
-          type: 'image',
-          name: sample.name,
-          url: sample.url,
-          size: sample.size,
-        },
-      ],
-    }));
-  };
-
-  const handleRemoveMedia = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      media: prev.media.filter((m) => m.id !== id),
-    }));
   };
 
   // If successfully submitted, show receipt and celebration card
