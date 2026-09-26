@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Camera,
@@ -146,30 +146,45 @@ export default function ReportWizard({
     }
   };
 
+  const topRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTop = () => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleNextStep = () => {
     setErrorMessage('');
     if (currentStep === 1) {
       if (!formData.isAnonymous && (!formData.fullName.trim() || !formData.email.trim())) {
         setErrorMessage('Please provide your name and email or check "Report Anonymously".');
+        scrollToTop();
         return;
       }
     } else if (currentStep === 2) {
       if (!formData.title.trim() || !formData.description.trim()) {
         setErrorMessage('Please provide a title and detailed description of the problem.');
+        scrollToTop();
         return;
       }
     } else if (currentStep === 4) {
       if (!formData.address.trim()) {
         setErrorMessage('Please specify or verify the address/location.');
+        scrollToTop();
         return;
       }
     }
     setCurrentStep((prev) => prev + 1);
+    scrollToTop();
   };
 
   const handlePrevStep = () => {
     setErrorMessage('');
     setCurrentStep((prev) => Math.max(1, prev - 1));
+    scrollToTop();
   };
 
   const handleSubmit = async () => {
