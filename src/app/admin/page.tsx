@@ -55,22 +55,12 @@ export default function AdminPage() {
           <div className="flex items-center justify-between h-16">
             {/* Admin Branding */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-blue-600 flex items-center justify-center text-white">
                 <ShieldAlert className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                    CivicPulse
-                  </span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300">
-                    Staff Command Center
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-                  Municipal Administration & Dispatch Operations
-                </p>
-              </div>
+              <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
+                CivicPulse
+              </span>
             </div>
 
             {/* Right Tools: Role Switcher, White Mode Toggle, Back to User Site */}

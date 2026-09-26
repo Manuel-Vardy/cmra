@@ -46,22 +46,12 @@ export default function Navbar({
             className="flex items-center gap-3 cursor-pointer select-none"
             onClick={() => setActiveTab('report')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white">
               <ShieldAlert className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-950 dark:from-white dark:via-blue-200 dark:to-indigo-300 bg-clip-text text-transparent">
-                  CivicPulse
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
-                  CMRA
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-                Report → Respond → Resolve
-              </p>
-            </div>
+            <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
+              CivicPulse
+            </span>
           </div>
 
           {/* Navigation Tabs */}

@@ -27,22 +27,12 @@ export default function UserNavbar({ activeTab, setActiveTab }: UserNavbarProps)
             className="flex items-center gap-3 cursor-pointer select-none group"
             onClick={() => setActiveTab('home')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
               <ShieldAlert className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                  CivicPulse
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
-                  Resident Portal
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-                Report → Respond → Resolve
-              </p>
-            </div>
+            <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
+              CivicPulse
+            </span>
           </div>
 
           {/* 3 Nav Links requested by user: Report Issue, Track Status, Public Map (plus Home) */}

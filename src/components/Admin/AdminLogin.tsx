@@ -99,10 +99,7 @@ export default function AdminLogin({ onAuthenticated }: AdminLoginProps) {
               <h1 className="text-2xl font-extrabold text-white tracking-tight">
                 CivicPulse
               </h1>
-              <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-indigo-950 border border-indigo-700/50 text-indigo-300 text-[11px] font-bold uppercase tracking-widest">
-                Staff Command Center
-              </div>
-              <p className="mt-3 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 Authorized personnel only.
                 <br />
                 Sign in to access the admin portal.
