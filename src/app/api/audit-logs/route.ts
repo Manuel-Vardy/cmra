@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/db';
+import { getAllAuditLogs } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const { auditLogs } = getDatabase();
+  const auditLogs = await getAllAuditLogs();
   return NextResponse.json({ auditLogs });
 }

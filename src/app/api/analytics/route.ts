@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/db';
+import { getAllReports } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const { reports } = getDatabase();
+  const reports = await getAllReports();
   const now = Date.now();
 
   const total = reports.length;

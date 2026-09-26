@@ -522,7 +522,7 @@ export function addAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>) {
     timestamp: new Date().toISOString(),
   };
   auditLogs.unshift(newEntry);
-  // Persist to Firestore in background
+  // Persist to Firestore with error logging
   import('./firestoreService').then(({ saveAuditLogToFirestore }) => {
     saveAuditLogToFirestore(newEntry).catch((err) => {
       console.warn('[Firestore] Background audit log write failed:', err);
@@ -534,11 +534,18 @@ export function addAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>) {
 export async function addReport(newReport: IssueReport): Promise<IssueReport> {
   const { reports } = getDatabase();
   reports.unshift(newReport);
-  // Persist to Firestore in background
-  const { saveReportToFirestore } = await import('./firestoreService');
-  saveReportToFirestore(newReport).catch((err) => {
-    console.warn('[Firestore] Background report write failed:', err);
-  });
+
+  // Await persist to Firestore directly so serverless functions do not terminate early
+  try {
+    const { saveReportToFirestore } = await import('./firestoreService');
+    const success = await saveReportToFirestore(newReport);
+    if (!success) {
+      console.warn('[Firestore] Failed to save report to Firestore.');
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error saving report to Firestore:', err);
+  }
+
   return newReport;
 }
 
@@ -550,15 +557,105 @@ export async function updateReport(
   const index = reports.findIndex(
     (r) => r.id === id || r.reportNumber.toLowerCase() === id.toLowerCase()
   );
-  if (index === -1) return null;
+  if (index !== -1) {
+    reports[index] = { ...reports[index], ...updates };
+  }
 
-  reports[index] = { ...reports[index], ...updates };
-  // Persist to Firestore in background
-  const { updateReportInFirestore } = await import('./firestoreService');
-  updateReportInFirestore(reports[index].id, updates).catch((err) => {
-    console.warn('[Firestore] Background report update failed:', err);
-  });
-  return reports[index];
+  // Await persist to Firestore directly
+  try {
+    const { updateReportInFirestore } = await import('./firestoreService');
+    const targetId = index !== -1 ? reports[index].id : id;
+    await updateReportInFirestore(targetId, updates);
+  } catch (err) {
+    console.warn('[Firestore] Error updating report in Firestore:', err);
+  }
+
+  return index !== -1 ? reports[index] : null;
+}
+
+/**
+ * Fetch all reports: first queries Firestore for live data, merging with in-memory state.
+ */
+export async function getAllReports(): Promise<IssueReport[]> {
+  try {
+    const { fetchReportsFromFirestore } = await import('./firestoreService');
+    const firestoreReports = await fetchReportsFromFirestore();
+
+    if (firestoreReports && firestoreReports.length > 0) {
+      // Merge Firestore documents with local memory to prevent race conditions
+      const reportMap = new Map<string, IssueReport>();
+      firestoreReports.forEach((r) => reportMap.set(r.id, r));
+
+      const localReports = getDatabase().reports;
+      localReports.forEach((r) => {
+        if (!reportMap.has(r.id)) {
+          reportMap.set(r.id, r);
+        }
+      });
+
+      const combined = Array.from(reportMap.values());
+      combined.sort(
+        (a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime()
+      );
+      global.__CIVIC_REPORTS__ = combined;
+      return combined;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error fetching reports, falling back to local database:', err);
+  }
+
+  return getDatabase().reports;
+}
+
+/**
+ * Fetch a single report by ID or reportNumber from Firestore or memory.
+ */
+export async function getReportByIdOrNumber(identifier: string): Promise<IssueReport | null> {
+  const trimmed = identifier.trim();
+
+  // Try fetching from Firestore first for authoritative data
+  try {
+    const { fetchReportByIdOrNumber } = await import('./firestoreService');
+    const firestoreReport = await fetchReportByIdOrNumber(trimmed);
+    if (firestoreReport) {
+      const { reports } = getDatabase();
+      const existingIdx = reports.findIndex((r) => r.id === firestoreReport.id);
+      if (existingIdx !== -1) {
+        reports[existingIdx] = firestoreReport;
+      } else {
+        reports.unshift(firestoreReport);
+      }
+      return firestoreReport;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error fetching report by ID from Firestore:', err);
+  }
+
+  // Fallback to local memory
+  const { reports } = getDatabase();
+  return (
+    reports.find(
+      (r) => r.id === trimmed || r.reportNumber.toLowerCase() === trimmed.toLowerCase()
+    ) || null
+  );
+}
+
+/**
+ * Fetch all audit logs from Firestore or memory.
+ */
+export async function getAllAuditLogs(): Promise<AuditLogEntry[]> {
+  try {
+    const { fetchAuditLogsFromFirestore } = await import('./firestoreService');
+    const firestoreLogs = await fetchAuditLogsFromFirestore();
+    if (firestoreLogs && firestoreLogs.length > 0) {
+      global.__CIVIC_AUDIT_LOGS__ = firestoreLogs;
+      return firestoreLogs;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error fetching audit logs from Firestore:', err);
+  }
+
+  return getDatabase().auditLogs;
 }
 
 export { INITIAL_REPORTS, INITIAL_AUDIT_LOGS };

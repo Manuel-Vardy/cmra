@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, generateReportNumber, detectDuplicates, addAuditLog, addReport } from '@/lib/db';
+import { getDatabase, generateReportNumber, detectDuplicates, addAuditLog, addReport, getAllReports } from '@/lib/db';
 import { IssueReport, ReportPriority, ReportStatus } from '@/lib/types';
 import { sendReportCreatedNotification } from '@/lib/emailService';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const { reports } = getDatabase();
+  const reports = await getAllReports();
 
   const query = searchParams.get('q')?.toLowerCase() || '';
   const status = searchParams.get('status');

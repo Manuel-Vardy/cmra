@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, addAuditLog, updateReport } from '@/lib/db';
+import { getDatabase, addAuditLog, updateReport, getReportByIdOrNumber } from '@/lib/db';
 import { ReportStatus, ReportPriority } from '@/lib/types';
 import { sendReportStatusUpdatedNotification } from '@/lib/emailService';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { reports } = getDatabase();
-
-  const report = reports.find(
-    (r) => r.id === id || r.reportNumber.toLowerCase() === id.toLowerCase()
-  );
+  const report = await getReportByIdOrNumber(id);
 
   if (!report) {
     return NextResponse.json({ error: 'Report not found' }, { status: 404 });
@@ -26,18 +24,13 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { reports } = getDatabase();
+  const report = await getReportByIdOrNumber(id);
   const body = await request.json();
 
-  const index = reports.findIndex(
-    (r) => r.id === id || r.reportNumber.toLowerCase() === id.toLowerCase()
-  );
-
-  if (index === -1) {
+  if (!report) {
     return NextResponse.json({ error: 'Report not found' }, { status: 404 });
   }
 
-  const report = reports[index];
   const now = new Date().toISOString();
   const actor = body.actorName || 'Admin User';
   const role = body.actorRole || 'community_admin';
@@ -191,7 +184,6 @@ export async function PATCH(
   }
 
   report.updatedAt = now;
-  reports[index] = report;
   await updateReport(report.id, report);
 
   return NextResponse.json({ success: true, report });

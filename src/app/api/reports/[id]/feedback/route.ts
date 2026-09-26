@@ -1,28 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, addAuditLog } from '@/lib/db';
+import { getReportByIdOrNumber, updateReport, addAuditLog } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { reports } = getDatabase();
+  const report = await getReportByIdOrNumber(id);
   const body = await request.json();
-
-  const report = reports.find(
-    (r) => r.id === id || r.reportNumber.toLowerCase() === id.toLowerCase()
-  );
 
   if (!report) {
     return NextResponse.json({ error: 'Report not found' }, { status: 404 });
   }
 
-  report.feedback = {
+  const feedback = {
     satisfied: !!body.satisfied,
     rating: Number(body.rating) || 5,
     comments: body.comments || '',
     submittedAt: new Date().toISOString(),
   };
+
+  report.feedback = feedback;
+  await updateReport(report.id, { feedback });
 
   addAuditLog({
     reportId: report.id,
