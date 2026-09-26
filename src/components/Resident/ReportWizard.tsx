@@ -113,33 +113,25 @@ export default function ReportWizard({
     fullName: '',
     email: '',
     phone: '',
-    town: 'Metro District',
-    community: 'Downtown Central',
+    town: '',
+    community: '',
     isAnonymous: false,
 
     // Step 2: Issue details
     category: initialCategory,
-    subCategory: 'Open Drains / Flooding',
+    subCategory: CATEGORIES.find((c) => c.id === initialCategory)?.subcategories[0] || 'Open Drains / Flooding',
     title: '',
     description: '',
     priority: 'Medium' as ReportPriority,
 
-    // Step 3: Media
-    media: [
-      {
-        id: 'm-default-1',
-        type: 'image',
-        name: 'site_photo_1.jpg',
-        url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-        size: '2.4 MB',
-      },
-    ] as ReportMedia[],
+    // Step 3: Media (empty by default — residents upload or capture their own)
+    media: [] as ReportMedia[],
     videoUrl: '',
 
     // Step 4: Location
-    latitude: 40.7128,
-    longitude: -74.006,
-    address: 'Near 142 Market Street, Central Square',
+    latitude: 5.6037,
+    longitude: -0.187,
+    address: '',
   });
 
   const triggerConfetti = () => {

@@ -5,6 +5,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy,
   limit,
@@ -197,4 +198,49 @@ export async function seedFirestoreIfEmpty(
     console.warn('[Firestore] Seeding skipped or encountered error (check rules):', error);
     return { seeded: false, reportCount: 0, logCount: 0 };
   }
+}
+
+/**
+ * Delete a report document from Firestore.
+ */
+export async function deleteReportFromFirestore(reportId: string): Promise<boolean> {
+  try {
+    const docRef = doc(db, REPORTS_COLLECTION, reportId);
+    await deleteDoc(docRef);
+    return true;
+  } catch (error) {
+    console.warn('[Firestore] Error deleting report:', error);
+    return false;
+  }
+}
+
+/**
+ * Clear all reports and audit logs from Firestore.
+ */
+export async function clearAllFromFirestore(): Promise<{ reportsDeleted: number; logsDeleted: number }> {
+  let reportsDeleted = 0;
+  let logsDeleted = 0;
+  try {
+    const reportsRef = collection(db, REPORTS_COLLECTION);
+    const repSnap = await getDocs(reportsRef);
+    for (const d of repSnap.docs) {
+      await deleteDoc(doc(db, REPORTS_COLLECTION, d.id));
+      reportsDeleted++;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error clearing reports:', err);
+  }
+
+  try {
+    const logsRef = collection(db, AUDIT_LOGS_COLLECTION);
+    const logSnap = await getDocs(logsRef);
+    for (const d of logSnap.docs) {
+      await deleteDoc(doc(db, AUDIT_LOGS_COLLECTION, d.id));
+      logsDeleted++;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Error clearing logs:', err);
+  }
+
+  return { reportsDeleted, logsDeleted };
 }

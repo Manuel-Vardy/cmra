@@ -19,6 +19,7 @@ import {
   ExternalLink,
   GitMerge,
   Send,
+  Trash2,
 } from 'lucide-react';
 import {
   IssueReport,
@@ -31,6 +32,7 @@ interface ReportDetailDrawerProps {
   report: IssueReport | null;
   onClose: () => void;
   onUpdate: (updatedReport: IssueReport) => void;
+  onDelete?: (id: string, reportNumber: string) => void;
   currentRole: UserRole;
   currentUserName?: string;
 }
@@ -44,15 +46,12 @@ const DEPARTMENTS = [
   'Community Safety & Bylaw',
 ];
 
-const RESOLUTION_SAMPLE_PHOTOS = [
-  'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80',
-];
 
 export default function ReportDetailDrawer({
   report,
   onClose,
   onUpdate,
+  onDelete,
   currentRole,
   currentUserName = 'Elena Gomez (Admin)',
 }: ReportDetailDrawerProps) {
@@ -74,9 +73,7 @@ export default function ReportDetailDrawer({
   // Resolution evidence form
   const [showResolutionForm, setShowResolutionForm] = useState(false);
   const [resolutionNotes, setResolutionNotes] = useState('');
-  const [resolutionPhotos, setResolutionPhotos] = useState<string[]>([
-    RESOLUTION_SAMPLE_PHOTOS[0],
-  ]);
+  const [resolutionPhotos, setResolutionPhotos] = useState<string[]>([]);
 
   // Notes/Comments
   const [newComment, setNewComment] = useState('');
@@ -247,12 +244,28 @@ export default function ReportDetailDrawer({
             </h2>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  onDelete(report.id, report.reportNumber);
+                  onClose();
+                }}
+                title="Delete this report"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-100 transition shadow-2xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete Case
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Action feedback flash */}
@@ -538,21 +551,13 @@ export default function ReportDetailDrawer({
                   <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     After-Resolution Photo Evidence URL
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={resolutionPhotos[0] || ''}
-                      onChange={(e) => setResolutionPhotos([e.target.value])}
-                      className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setResolutionPhotos([RESOLUTION_SAMPLE_PHOTOS[1]])}
-                      className="px-2.5 py-1 text-[11px] bg-slate-100 dark:bg-slate-800 rounded-lg border text-slate-600 dark:text-slate-300"
-                    >
-                      Sample Photo
-                    </button>
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="https://... photo URL or file evidence link"
+                    value={resolutionPhotos[0] || ''}
+                    onChange={(e) => setResolutionPhotos([e.target.value])}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
+                  />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-1">

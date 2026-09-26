@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, addAuditLog, updateReport, getReportByIdOrNumber } from '@/lib/db';
+import { getDatabase, addAuditLog, updateReport, getReportByIdOrNumber, deleteReport } from '@/lib/db';
 import { ReportStatus, ReportPriority } from '@/lib/types';
 import { sendReportStatusUpdatedNotification } from '@/lib/emailService';
 
@@ -187,4 +187,23 @@ export async function PATCH(
   await updateReport(report.id, report);
 
   return NextResponse.json({ success: true, report });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const report = await getReportByIdOrNumber(id);
+
+  if (!report) {
+    return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+  }
+
+  await deleteReport(report.id);
+
+  return NextResponse.json({
+    success: true,
+    message: `Report ${report.reportNumber} has been removed.`,
+  });
 }

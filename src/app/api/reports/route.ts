@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, generateReportNumber, detectDuplicates, addAuditLog, addReport, getAllReports } from '@/lib/db';
+import { getDatabase, generateReportNumber, detectDuplicates, addAuditLog, addReport, getAllReports, clearAllData } from '@/lib/db';
 import { IssueReport, ReportPriority, ReportStatus } from '@/lib/types';
 import { sendReportCreatedNotification } from '@/lib/emailService';
 
@@ -165,5 +165,18 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating report:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const result = await clearAllData();
+    return NextResponse.json({
+      success: true,
+      message: 'All reports and audit logs cleared.',
+      result,
+    });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || 'Failed to clear reports' }, { status: 500 });
   }
 }

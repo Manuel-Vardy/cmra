@@ -22,6 +22,7 @@ import {
   Flame,
   Radio,
   Database,
+  Trash2,
 } from 'lucide-react';
 import {
   IssueReport,
@@ -117,6 +118,43 @@ export default function AdminDashboard({ currentRole }: AdminDashboardProps) {
       setTimeout(() => setFirestoreStatus(null), 3500);
     } finally {
       setFirestoreSyncing(false);
+    }
+  };
+
+  const handleDeleteReport = async (id: string, reportNumber: string) => {
+    if (!confirm(`Are you sure you want to permanently delete report ${reportNumber}?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setReports((prev) => prev.filter((r) => r.id !== id && r.reportNumber !== id));
+        if (selectedReport?.id === id || selectedReport?.reportNumber === id) {
+          setSelectedReport(null);
+        }
+      } else {
+        alert('Failed to delete report.');
+      }
+    } catch {
+      alert('Network error while deleting report.');
+    }
+  };
+
+  const handleClearAllReports = async () => {
+    if (!confirm('Are you sure you want to permanently clear ALL reports and reset the database?')) {
+      return;
+    }
+    try {
+      const res = await fetch('/api/reports', { method: 'DELETE' });
+      if (res.ok) {
+        setReports([]);
+        setSelectedReport(null);
+        alert('All reports cleared successfully.');
+      } else {
+        alert('Failed to clear reports.');
+      }
+    } catch {
+      alert('Network error while clearing reports.');
     }
   };
 
@@ -227,6 +265,14 @@ export default function AdminDashboard({ currentRole }: AdminDashboardProps) {
           >
             <Download className="w-3.5 h-3.5 text-blue-600" />
             Export CSV
+          </button>
+          <button
+            onClick={handleClearAllReports}
+            title="Permanently remove all reports and start fresh"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition shadow-sm"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Clear All Reports
           </button>
           <button
             onClick={fetchData}
@@ -612,15 +658,27 @@ export default function AdminDashboard({ currentRole }: AdminDashboardProps) {
 
                           {/* Action */}
                           <td className="py-4 px-4 text-right whitespace-nowrap">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedReport(report);
-                              }}
-                              className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-300 rounded-lg font-bold text-xs transition"
-                            >
-                              Triage Case
-                            </button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedReport(report);
+                                }}
+                                className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-300 rounded-lg font-bold text-xs transition"
+                              >
+                                Triage Case
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteReport(report.id, report.reportNumber);
+                                }}
+                                title="Delete Report"
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -713,6 +771,7 @@ export default function AdminDashboard({ currentRole }: AdminDashboardProps) {
           report={selectedReport}
           onClose={() => setSelectedReport(null)}
           onUpdate={handleUpdateReport}
+          onDelete={handleDeleteReport}
           currentRole={currentRole}
           currentUserName="Elena Gomez (Admin)"
         />

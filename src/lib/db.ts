@@ -194,4 +194,49 @@ export async function getAllAuditLogs(): Promise<AuditLogEntry[]> {
   return getDatabase().auditLogs;
 }
 
+/**
+ * Delete a report by ID or reportNumber from memory and Firestore.
+ */
+export async function deleteReport(identifier: string): Promise<boolean> {
+  const { reports } = getDatabase();
+  const trimmed = identifier.trim();
+  const index = reports.findIndex(
+    (r) => r.id === trimmed || r.reportNumber.toLowerCase() === trimmed.toLowerCase()
+  );
+  let targetId = trimmed;
+  if (index !== -1) {
+    targetId = reports[index].id;
+    reports.splice(index, 1);
+  }
+
+  try {
+    const { deleteReportFromFirestore } = await import('./firestoreService');
+    await deleteReportFromFirestore(targetId);
+  } catch (err) {
+    console.warn('[Firestore] Error deleting report:', err);
+  }
+
+  return true;
+}
+
+/**
+ * Clear all reports and audit logs from memory and Firestore.
+ */
+export async function clearAllData(): Promise<{ reportsCleared: number; logsCleared: number }> {
+  const count = getDatabase().reports.length;
+  const logCount = getDatabase().auditLogs.length;
+
+  global.__CIVIC_REPORTS__ = [];
+  global.__CIVIC_AUDIT_LOGS__ = [];
+
+  try {
+    const { clearAllFromFirestore } = await import('./firestoreService');
+    await clearAllFromFirestore();
+  } catch (err) {
+    console.warn('[Firestore] Error clearing Firestore:', err);
+  }
+
+  return { reportsCleared: count, logsCleared: logCount };
+}
+
 export { INITIAL_REPORTS, INITIAL_AUDIT_LOGS };
