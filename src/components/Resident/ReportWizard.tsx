@@ -159,8 +159,8 @@ export default function ReportWizard({
   const handleNextStep = () => {
     setErrorMessage('');
     if (currentStep === 1) {
-      if (!formData.isAnonymous && (!formData.fullName.trim() || !formData.email.trim())) {
-        setErrorMessage('Please provide your name and email or check "Report Anonymously".');
+      if (!formData.fullName.trim() || !formData.email.trim()) {
+        setErrorMessage('Please provide your full name and email address.');
         scrollToTop();
         return;
       }
@@ -396,88 +396,61 @@ export default function ReportWizard({
               </p>
             </div>
 
-            {/* Anonymous Toggle */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <div>
-                  <div className="font-semibold text-sm text-slate-800 dark:text-slate-200">
-                    Report Anonymously
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Your name and email will not be linked to the public record.
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="e.g. Kwame Mensah"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                />
               </div>
-              <input
-                type="checkbox"
-                checked={formData.isAnonymous}
-                onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
-                className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
-              />
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="e.g. kwame@example.com"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Phone / Contact Number (Optional SMS)
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="e.g. +233 24 123 4567"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Community / Neighborhood *
+                </label>
+                <input
+                  type="text"
+                  value={formData.community}
+                  onChange={(e) => setFormData({ ...formData, community: e.target.value })}
+                  placeholder="e.g. Adabraka, Labadi, Tema"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
             </div>
-
-            {!formData.isAnonymous && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="e.g. Marcus Vance"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="e.g. m.vance@example.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Phone / Contact Number (Optional SMS)
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="e.g. +1 (555) 234-8901"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Community / Neighborhood *
-                  </label>
-                  <select
-                    value={formData.community}
-                    onChange={(e) => setFormData({ ...formData, community: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  >
-                    <option value="Downtown Central">Downtown Central</option>
-                    <option value="Oakridge Heights">Oakridge Heights</option>
-                    <option value="Pine Grove">Pine Grove</option>
-                    <option value="Harborview">Harborview</option>
-                    <option value="Riverside Park">Riverside Park</option>
-                  </select>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -541,8 +514,14 @@ export default function ReportWizard({
                 Issue Subcategory
               </label>
               <select
-                value={formData.subCategory}
-                onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+                value={formData.subCategory === '__other__' ? '__other__' : formData.subCategory}
+                onChange={(e) => {
+                  if (e.target.value === '__other__') {
+                    setFormData({ ...formData, subCategory: '__other__' });
+                  } else {
+                    setFormData({ ...formData, subCategory: e.target.value });
+                  }
+                }}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 {CATEGORIES.find((c) => c.id === formData.category)?.subcategories.map((sub) => (
@@ -550,7 +529,22 @@ export default function ReportWizard({
                     {sub}
                   </option>
                 ))}
+                <option value="__other__">Other (specify below)</option>
               </select>
+
+              {/* Free-text input shown when user picks Other */}
+              {formData.subCategory === '__other__' && (
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Describe the issue type..."
+                  className="mt-2 w-full px-4 py-2.5 rounded-xl border border-blue-400 dark:border-blue-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  onChange={(e) => {
+                    // Store the typed value prefixed so we can distinguish it from preset values
+                    setFormData({ ...formData, subCategory: e.target.value || '__other__' });
+                  }}
+                />
+              )}
             </div>
 
             {/* Issue Title */}
@@ -798,3 +792,4 @@ export default function ReportWizard({
     </div>
   );
 }
+
