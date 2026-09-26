@@ -1,69 +1,156 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+import Link from 'next/link';
+import UserNavbar, { UserNavTab } from '@/components/UserNavbar';
+import UserHomePage from '@/components/Resident/UserHomePage';
+import ReportWizard from '@/components/Resident/ReportWizard';
+import TrackReportView from '@/components/Resident/TrackReportView';
+import PublicMapPage from '@/components/PublicMap/PublicMapPage';
+import { IssueCategory } from '@/lib/types';
+import { ArrowLeft, ShieldAlert } from 'lucide-react';
+
+export default function ResidentPortalPage() {
+  const [activeTab, setActiveTab] = useState<UserNavTab>('home');
+  const [selectedCategory, setSelectedCategory] = useState<IssueCategory>('Environment');
+  const [trackingReportNumber, setTrackingReportNumber] = useState<string>('CR-2026-004821');
+
+  const handleTrackReport = (reportNumber: string) => {
+    setTrackingReportNumber(reportNumber);
+    setActiveTab('track');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectCategoryFromHome = (category: IssueCategory) => {
+    setSelectedCategory(category);
+    setActiveTab('report');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
+      {/* User Header with the 3 exact nav links + theme toggle */}
+      <UserNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {/* Main Content View */}
+      <main className="flex-1 pb-16">
+        {/* VIEW 1: DEDICATED USER HOMEPAGE */}
+        {activeTab === 'home' && (
+          <UserHomePage
+            onNavigateTab={(tab) => {
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectCategory={handleSelectCategoryFromHome}
+          />
+        )}
+
+        {/* VIEW 2: REPORT ISSUE */}
+        {activeTab === 'report' && (
+          <div className="space-y-4">
+            {/* Context breadcrumb header */}
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Home</span>
+              </button>
+
+              <span className="text-xs font-semibold text-slate-400">
+                Resident Reporting Wizard
+              </span>
+            </div>
+
+            <ReportWizard
+              initialCategory={selectedCategory}
+              onTrackReport={handleTrackReport}
+              onReportCreated={(rep) => {
+                setTrackingReportNumber(rep.reportNumber);
+              }}
+              onBackToHome={() => setActiveTab('home')}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          </div>
+        )}
+
+        {/* VIEW 3: TRACK STATUS */}
+        {activeTab === 'track' && (
+          <div className="space-y-4">
+            {/* Context breadcrumb header */}
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Home</span>
+              </button>
+
+              <span className="text-xs font-semibold text-slate-400">
+                Case Tracking & Resolution Journey
+              </span>
+            </div>
+
+            <TrackReportView initialReportNumber={trackingReportNumber} />
+          </div>
+        )}
+
+        {/* VIEW 4: PUBLIC MAP */}
+        {activeTab === 'map' && (
+          <div className="space-y-4">
+            {/* Context breadcrumb header */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Home</span>
+              </button>
+
+              <span className="text-xs font-semibold text-slate-400">
+                Community Transparency Map
+              </span>
+            </div>
+
+            <PublicMapPage onTrackReport={handleTrackReport} />
+          </div>
+        )}
       </main>
+
+      {/* Resident Site Footer */}
+      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 text-xs text-slate-500 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-800 dark:text-slate-200">CivicPulse Resident Portal</span>
+            <span>• Community Problem Management</span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <button onClick={() => setActiveTab('report')} className="hover:text-blue-600 transition">
+              Report Issue
+            </button>
+            <button onClick={() => setActiveTab('track')} className="hover:text-blue-600 transition">
+              Track Status
+            </button>
+            <button onClick={() => setActiveTab('map')} className="hover:text-blue-600 transition">
+              Public Map
+            </button>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
+              title="Municipal Staff Access (/admin)"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-indigo-500/70" />
+              <span>Staff Portal</span>
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
