@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       comments: [],
-      potentialDuplicates: potentialDuplicates.length > 0 ? potentialDuplicates : undefined,
+      potentialDuplicates: potentialDuplicates.length > 0 ? potentialDuplicates : [],
     };
 
     await addReport(newReport);

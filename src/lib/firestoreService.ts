@@ -76,6 +76,10 @@ export async function fetchReportByIdOrNumber(
   }
 }
 
+function cleanForFirestore<T>(data: T): any {
+  return JSON.parse(JSON.stringify(data));
+}
+
 /**
  * Save a new report to Firestore.
  */
@@ -84,14 +88,15 @@ export async function saveReportToFirestore(
 ): Promise<boolean> {
   try {
     const docRef = doc(db, REPORTS_COLLECTION, report.id);
+    const cleaned = cleanForFirestore(report);
     await setDoc(docRef, {
-      ...report,
+      ...cleaned,
       _firestoreCreatedAt: serverTimestamp(),
     });
     console.log(`[Firestore] Saved report ${report.reportNumber} (ID: ${report.id})`);
     return true;
   } catch (error) {
-    console.warn('[Firestore] Error saving report:', error);
+    console.error('[Firestore] Error saving report:', error);
     return false;
   }
 }
@@ -105,14 +110,15 @@ export async function updateReportInFirestore(
 ): Promise<boolean> {
   try {
     const docRef = doc(db, REPORTS_COLLECTION, id);
+    const cleaned = cleanForFirestore(updates);
     await updateDoc(docRef, {
-      ...updates,
+      ...cleaned,
       _firestoreUpdatedAt: serverTimestamp(),
     });
     console.log(`[Firestore] Updated report ${id}`);
     return true;
   } catch (error) {
-    console.warn('[Firestore] Error updating report:', error);
+    console.error('[Firestore] Error updating report:', error);
     return false;
   }
 }
@@ -144,13 +150,14 @@ export async function saveAuditLogToFirestore(
 ): Promise<boolean> {
   try {
     const docRef = doc(db, AUDIT_LOGS_COLLECTION, log.id);
+    const cleaned = cleanForFirestore(log);
     await setDoc(docRef, {
-      ...log,
+      ...cleaned,
       _firestoreCreatedAt: serverTimestamp(),
     });
     return true;
   } catch (error) {
-    console.warn('[Firestore] Error saving audit log:', error);
+    console.error('[Firestore] Error saving audit log:', error);
     return false;
   }
 }
